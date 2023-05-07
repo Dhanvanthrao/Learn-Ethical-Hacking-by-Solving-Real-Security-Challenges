@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CTF Website</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .container-box {
+            border: 1px solid black;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>CTF Website</h1>
+        <p>Welcome to the CTF website!</p>
+
+        {% for container in container_info %}
+        <div class="container-box">
+            <div class="float-right">
+                {% if container.status == "running" %}
+                    <span class="badge badge-success">Running</span>
+                {% else %}
+                    <span class="badge badge-danger">Stopped</span>
+                {% endif %}
+            </div>
+            <h3>{{ container.name }}</h3>
+            <p><strong>Image:</strong> {{ container.image }}</p>
+            <p><strong>IP Address:</strong> {{ container.ip }}</p>
+            <p><strong>Ports:</strong>
+                {% for port in container.ports %}
+                    <span class="port_info">{{ port }}</span>
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
+                </p>
+            <button class="btn btn-success" data-container-id="{{ container.id }}" data-action="start">Start</button>
+            <button class="btn btn-danger" data-container-id="{{ container.id }}" data-action="stop">Stop</button>
+            <button class="btn btn-warning" data-container-id="{{ container.id }}" data-action="restart">Restart</button>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Add click handlers to container buttons
+            $('.container-box button').click(function() {
+                var container_id = $(this).data('container-id');
+                var action = $(this).data('action');
+
+                $.ajax({
+                    url: '/' + action,
+                    type: 'POST',
+                    data: {
+                        'container_id': container_id
+                    },
+                    success: function(response) {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
